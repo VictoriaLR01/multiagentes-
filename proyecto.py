@@ -39,11 +39,11 @@ def get_grid(model):
       cell_content, x, y = cell
       for obj in cell_content:
         if isinstance(obj, Cajon):
-          grid[x][y] = 2
+          grid[x][y] = 10
         elif isinstance(obj, Calle):
-          grid[x][y] = 1
+          grid[x][y] = obj.giro
         else:
-          grid[x][y] = 3
+          grid[x][y] = 11
     return grid
 #Variables globales
 '''
@@ -76,7 +76,7 @@ class Calle(Agent):
   '''
   def __init__(self, unique_id,model, giro):
       super().__init__(unique_id,model)
-      self.giro = 0
+      self.giro = giro
          
 
 #Agente tipo cajón 
@@ -110,7 +110,7 @@ class Vehiculo(Agent):
 
 		
   '''
-  def __init__(self, unique_id,model, tipo_vehiculo, pos, tiempo_estacionado):
+  def __init__(self, unique_id, model, tipo_vehiculo, pos, tiempo_estacionado):
     super().__init__(unique_id,model)
     self.pos = "posicion donde incian todos ESTO DEBE DE SER UNA TUPLA"
     self.tipo_vehiculo = tipo_vehiculo
@@ -135,10 +135,10 @@ class Administrador(Agent):
 class Estacionamiento(Model):
   def __init__(self):
     super().__init__()
-    self.grid = MultiGrid(15,15, False)
+    self.grid = MultiGrid(14,12, False)
     self.schedule = SimultaneousActivation(self)
  
-  
+  #creación de cajones
     fila = 1;
     columnas =3; 
     for i in range (36):
@@ -150,54 +150,25 @@ class Estacionamiento(Model):
       columnas+=1;
       if (columnas == 9):
           columnas = 3;
-          if(fila%2!=0):
-            fila +=3;
+          if(fila%2 != 0):
+            fila += 3;
           else:
             fila+=1;
 
   # creación de calles
     fila = 2;
-    columnas =3; 
+    columnas = 3; 
     for i in range (90,126):
-      lado_gira=0
-      if(columnas == 1 and fila == 3):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 2 and fila == 3):
-          lado_gira= int(2)#gira der
-      elif(columnas == 1 and fila == 7):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 2 and fila == 7):
-          lado_gira= int(2)#gira der
-      elif(columnas == 2 and fila == 6):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 2 and fila == 11):
-          lado_gira= int(2)#gira der
-      elif(columnas == 2 and fila == 10):
-          lado_gira= int(1) #gira izq.  ## HASTA AQUI ES EL LADO IZQUIERDOOOOO
-      elif(columnas == 9 and fila == 2):
-          lado_gira= int(2)#gira der
-      elif(columnas == 9 and fila == 3):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 6):
-          lado_gira= int(2)#gira der
-      elif(columnas == 10 and fila == 6):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 7):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 10):
-          lado_gira= int(2)#gira der
-      elif(columnas == 10 and fila == 10):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 11):
-          lado_gira= int(1) #gira izq
+      if(fila%2==0):
+        lado_gira=5
       else:
-          lado_gira = int(0)
+        lado_gira = 7
       
       c = Calle(i,self,lado_gira);
-      self.grid.place_agent(c, (fila, columnas))
-      self.schedule.add(c)
+      self.grid.place_agent(c, (fila, columnas));
+      self.schedule.add(c);
       
-      columnas+=1;
+      columnas += 1;
       if (columnas == 9):
           columnas = 3;
           if(fila%2!=0):
@@ -206,45 +177,53 @@ class Estacionamiento(Model):
             fila+=1;
 
 
-    fila = int(2);
-    columnas =int(1); 
+    fila = 2;
+    columnas =1; 
     for i in range (40,84):
       # self.tipo = "calle" #esto no sé si este bien AHHHHH
         #c = Cajon(i,tipo_car);
         #self.grid.place_agent(c, (columnas, filas))
-      if(columnas == 1 and fila == 3):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 2 and fila == 3):
-          lado_gira= int(2)#gira der
-      elif(columnas == 1 and fila == 7):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 2 and fila == 7):
-          lado_gira= int(2)#gira der
-      elif(columnas == 2 and fila == 6):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 2 and fila == 11):
-          lado_gira= int(2)#gira der
-      elif(columnas == 2 and fila == 10):
-          lado_gira= int(1) #gira izq.  ## HASTA AQUI ES EL LADO IZQUIERDOOOOO
-      elif(columnas == 9 and fila == 2):
-          lado_gira= int(2)#gira der
-      elif(columnas == 9 and fila == 3):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 6):
-          lado_gira= int(2)#gira der
-      elif(columnas == 10 and fila == 6):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 7):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 10):
-          lado_gira= int(2)#gira der
-      elif(columnas == 10 and fila == 10):
-          lado_gira= int(1) #gira izq
-      elif(columnas == 9 and fila == 11):
-          lado_gira= int(1) #gira izq
+      if(columnas%2==0):
+        lado_gira=1
       else:
-          lago_gira = int(0)
-      
+        lado_gira=2
+      if(columnas == 1 and fila == 3):
+          lado_gira= 7 
+      elif(columnas == 2 and fila == 3):
+          lado_gira= 8 
+      elif(columnas == 1 and fila == 7):
+          lado_gira= 7
+      elif(columnas == 2 and fila == 7):
+          lado_gira= 8
+      elif(columnas == 2 and fila == 6):
+          lado_gira= 5
+      elif(columnas == 2 and fila == 11):
+          lado_gira= 8
+      elif(columnas == 2 and fila == 10):
+          lado_gira= 5
+      elif(columnas == 9 and fila == 2):
+          lado_gira= 6
+      elif(columnas == 9 and fila == 3):
+          lado_gira= 7
+      elif(columnas == 9 and fila == 6):
+          lado_gira= 6
+      elif(columnas == 10 and fila == 6):
+          lado_gira= 5
+      elif(columnas == 9 and fila == 7):
+          lado_gira= 7
+      elif(columnas == 9 and fila == 10):
+          lado_gira= 6
+      elif(columnas == 10 and fila == 10):
+          lado_gira= 5
+      elif(columnas == 9 and fila == 11):
+          lado_gira= 7
+      elif(columnas == 10 and fila == 2):
+          lado_gira= 3
+      elif(columnas == 2 and fila == 2):
+          lado_gira= 3
+      elif(columnas == 11 and fila == 1):
+          lado_gira= 4
+     
       c = Calle(i,self,lado_gira);
       self.grid.place_agent(c, (fila, columnas))
       self.schedule.add(c)
