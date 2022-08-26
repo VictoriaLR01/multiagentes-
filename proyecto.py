@@ -74,8 +74,8 @@ class Calle(Agent):
  2 -  3 gira a la derecha 
  3 - puede girar a las dos direcciones 
   '''
-  def __init__(self, unique_id, giro):
-      super().__init__(unique_id, giro)
+  def __init__(self, unique_id,model, giro):
+      super().__init__(unique_id,model)
       self.giro = 0
          
 
@@ -91,8 +91,8 @@ class Cajon(Agent):
   1 - discapicitados
   2 -  moto
   '''
-  def __init__(self, unique_id, tipo_vehiculo):
-    super().__init__(unique_id, tipo_vehiculo)
+  def __init__(self, unique_id,model,tipo_vehiculo):
+    super().__init__(unique_id,model)
     self.tipo_vehiculo = tipo_vehiculo
     self.estado = False 
   
@@ -110,8 +110,8 @@ class Vehiculo(Agent):
 
 		
   '''
-  def __init__(self, unique_id, tipo_vehiculo, pos, tiempo_estacionado):
-    super().__init__(unique_id, tipo_vehiculo, pos, tiempo_estacionado)
+  def __init__(self, unique_id,model, tipo_vehiculo, pos, tiempo_estacionado):
+    super().__init__(unique_id,model)
     self.pos = "posicion donde incian todos ESTO DEBE DE SER UNA TUPLA"
     self.tipo_vehiculo = tipo_vehiculo
     self.tiempo_estacionado = 0
@@ -128,8 +128,8 @@ class Administrador(Agent):
 
 		
   '''
-  def __init__(self):
-    super().__init__(unique_id)
+  def __init__(self,unique_id,model):
+    super().__init__(unique_id,model)
     
   
 class Estacionamiento(Model):
@@ -143,7 +143,7 @@ class Estacionamiento(Model):
     columnas =3; 
     for i in range (36):
       tipo_car = random.randint(0,2)
-      c = Cajon(i,tipo_car);
+      c = Cajon(i,self,tipo_car);
       self.grid.place_agent(c, (fila, columnas))
       self.schedule.add(c)
       print(columnas,fila)  
@@ -193,7 +193,7 @@ class Estacionamiento(Model):
       else:
           lado_gira = int(0)
       
-      c = Calle(i,lado_gira);
+      c = Calle(i,self,lado_gira);
       self.grid.place_agent(c, (fila, columnas))
       self.schedule.add(c)
       
@@ -245,7 +245,7 @@ class Estacionamiento(Model):
       else:
           lago_gira = int(0)
       
-      c = Calle(i,lado_gira);
+      c = Calle(i,self,lado_gira);
       self.grid.place_agent(c, (fila, columnas))
       self.schedule.add(c)
       fila+=1;
