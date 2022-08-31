@@ -45,6 +45,7 @@ def get_grid(model):
             grid[x][y] = 7 # moto negro
 
         elif isinstance(obj, Cajon):
+          '''
           if obj.tipo_vehiculo == 0:
             grid[x][y] = 5 # carro gris
           elif obj.tipo_vehiculo == 1:
@@ -52,6 +53,8 @@ def get_grid(model):
           else:
             grid[x][y] = 7 # moto negro
           #grid[x][y] = 10
+          '''
+          grid[x][y] = 0
         elif isinstance(obj, Calle):
           grid[x][y] = 3
         else:
@@ -128,7 +131,7 @@ class Vehiculo(Agent):
     super().__init__(unique_id,model) # agente
     #(13,2) posicion inicial
     self.tipo_vehiculo = tipo_vehiculo # moto, carro, discapacitados
-    self.tiempo_estacionado = random.randint(5,20) # una vez que se estacione, este es el numero de steps que estara estacionado
+    self.tiempo_estacionado = random.randint(10,60) # una vez que se estacione, este es el numero de steps que estara estacionado
     self.destino = None# el cajon que el administrador le asigna
     self.sig_pos = None# la siguiente celda a la que se va a mover cuando se ejecute el advance
 
@@ -179,7 +182,7 @@ class Vehiculo(Agent):
             else:
               col -= 1 # izquierda
           elif(vecino.giro == 7):#opciones abajo y a la derecha
-            if (col == self.destino[1] and row + 1 == self.destino[0]) or col == 9:
+            if (col == self.destino[1] and row + 1 == self.destino[0]) or (col == 9 and self.destino == (13,9)):
               row += 1 #abajo
             else:
               col += 1 #derecha
@@ -255,20 +258,20 @@ class Administrador(Agent):
           if not cajon.estado and (cajon.tipo_vehiculo == vecino.tipo_vehiculo):
             cajon.estado = True
             vecino.destino = cajon.pos
-            print("pos del cajon: ",cajon.pos)
             break
         break
 
  
   
 class Estacionamiento(Model):
-  def __init__(self):
+  def __init__(self,num_agentes_veh):
     super().__init__()
     self.grid = MultiGrid(14,12, False)
     self.schedule = SimultaneousActivation(self)
     self.cont_vehiculos = 0 # contador de vehiculos
     self.spawn = 0 # tiempo en el que va spawneando cada vehiculo 
-    self.maxNum_veh = random.randint(50, 150)
+    self.maxNum_veh = num_agentes_veh
+    
     
  
     #--------creación de cajones----------
@@ -433,30 +436,44 @@ class Estacionamiento(Model):
     #------------------------------------------------
     # queremos que los vehiculos se creen cada tanto tiempo 
     # def __init__(self, unique_id, model, tipo_vehiculo)
-    if(self.maxNum_veh > 0):
-      if(self.spawn > 0):
-        self.spawn -= 1
-      else:
+    if(self.maxNum_veh > 0): # si aun me quedan agentes para spawnear
+      if(self.spawn > 0): # si aun no es momento de spawnear
+        self.spawn -= 1 
+      else: # ya puedo spawnear el siguiente agente
         tipo = random.randint(0,2) # tipo de vehiculo
-        ve = Vehiculo(self.cont_vehiculos + 130, self, tipo)
+        ve = Vehiculo(str(self.cont_vehiculos) + 'vehiculo', self, tipo) # creamos el vehiculo
         self.cont_vehiculos += 1 # actualizamos el contador de vehiculos (que tambien va a ser el id del siguiente vehiculo)
         self.grid.place_agent(ve, (13,2)) # ponemos el vehiculo en la posicion (13, 2 que es donde esta el admin) 
         self.schedule.add(ve) # para que funcionen los steps
 
-        self.spawn = random.randint(5,15)
-
-      self.maxNum_veh -= 1
+        self.spawn = random.randint(5,15) # nuevo contador de spawn
+        self.maxNum_veh -= 1 # deducimos en 1 el numero de vehiculos
       
     
     # -----------------------------------------
     self.datacollector.collect(self)
     self.schedule.step()
+  
+  def terminar(self): #funcion que me dice si deberia o no terminar la simulacion
+    num_veh = 0
 
-model = Estacionamiento();
+    for c,x,y in self.grid.coord_iter():
+      for obj in c:
+        if isinstance(obj, Vehiculo):
+          num_veh += 1
+
+    return num_veh == 0 and self.maxNum_veh == 0
+
+numero_de_agentes = 30
+model = Estacionamiento(numero_de_agentes);
 print("numero de cajones comunes: ", cont_car_cajon)
 print('numero de cajones para discapacitados: ', cont_disc_cajon)
 print("numero de cajones para motos", cont_moto_cajon )
-for i in range(150):
+'''
+for i in range(25):
+  model.step()
+'''
+while not model.terminar():
   model.step()
 
 all_grid = model.datacollector.get_model_vars_dataframe()
