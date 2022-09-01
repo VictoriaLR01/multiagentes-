@@ -132,7 +132,7 @@ class Vehiculo(Agent):
     super().__init__(unique_id,model) # agente
     #(13,2) posicion inicial
     self.tipo_vehiculo = tipo_vehiculo # moto, carro, discapacitados
-    self.tiempo_estacionado = random.randint(10,60) # una vez que se estacione, este es el numero de steps que estara estacionado
+    self.tiempo_estacionado = random.randint(100,160) # una vez que se estacione, este es el numero de steps que estara estacionado
     self.destino = None# el cajon que el administrador le asigna
     self.sig_pos = None# la siguiente celda a la que se va a mover cuando se ejecute el advance
 
@@ -194,7 +194,17 @@ class Vehiculo(Agent):
               col += 1 #derecha
 
           break
+      
       self.sig_pos = (row,col)
+      #para evitar chocar
+      vecinos = self.model.grid.get_neighbors(
+        self.pos,
+        moore = True,
+        include_center = False)
+      for vecino in vecinos:
+        if isinstance(vecino, Vehiculo) and vecino.sig_pos == self.sig_pos:
+          self.sig_pos = self.pos
+      
     elif(self.pos == self.destino): # estoy estacionado
       if self.tiempo_estacionado > 0: #sigo estacionado
         self.tiempo_estacionado -= 1
@@ -212,8 +222,7 @@ class Vehiculo(Agent):
     
     
 
-  def advance(self):
-    if(self.sig_pos != None):
+  def advance(self):      
       if(self.pos == (13,9)):
         # lo sacamos del schedule
         self.model.schedule.remove(self)
@@ -447,7 +456,7 @@ class Estacionamiento(Model):
         self.grid.place_agent(ve, (13,2)) # ponemos el vehiculo en la posicion (13, 2 que es donde esta el admin) 
         self.schedule.add(ve) # para que funcionen los steps
 
-        self.spawn = random.randint(5,15) # nuevo contador de spawn
+        self.spawn = random.randint(4,8) # nuevo contador de spawn
         self.maxNum_veh -= 1 # deducimos en 1 el numero de vehiculos
       
     
@@ -465,7 +474,7 @@ class Estacionamiento(Model):
 
     return num_veh == 0 and self.maxNum_veh == 0
 
-numero_de_agentes = 30
+numero_de_agentes = 80
 model = Estacionamiento(numero_de_agentes);
 print("numero de cajones comunes: ", cont_car_cajon)
 print('numero de cajones para discapacitados: ', cont_disc_cajon)
