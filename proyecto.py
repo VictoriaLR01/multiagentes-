@@ -9,6 +9,7 @@ Original file is located at
 
 # Commented out IPython magic to ensure Python compatibility.
 # %pip install mesa
+# %pip nstall matplotlib
 from mesa import Agent, Model
 
 from mesa.space import MultiGrid
@@ -479,16 +480,18 @@ while not model.terminar():
 all_grid = model.datacollector.get_model_vars_dataframe()
 
 # Commented out IPython magic to ensure Python compatibility.
-# %%capture
-# 
-# fig, axs = plt.subplots(figsize=(7,7))
-# axs.set_xticks([])
-# axs.set_yticks([])
-# patch = plt.imshow(all_grid.iloc[0][0], cmap=plt.cm.binary)
-# 
-# def animate(i):
-#     patch.set_data(all_grid.iloc[i][0])
-#     
-# anim = animation.FuncAnimation(fig, animate, frames=len(all_grid))
+#%%capture
+#
+fig, axs = plt.subplots(figsize=(7,7))
+axs.set_xticks([])
+axs.set_yticks([])
+patch = plt.imshow(all_grid.iloc[0][0], cmap=plt.cm.binary)
+
+def animate(i):
+    patch.set_data(all_grid.iloc[i][0])
+    
+anim = animation.FuncAnimation(fig, animate, frames=len(all_grid))
 
 anim
+
+plt.show()
