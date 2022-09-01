@@ -197,6 +197,7 @@ class Vehiculo(Agent):
       
       self.sig_pos = (row,col)
       #para evitar chocar
+      
       vecinos = self.model.grid.get_neighbors(
         self.pos,
         moore = True,
@@ -229,7 +230,7 @@ class Vehiculo(Agent):
         # eliminamos al agente
         self.model.grid.remove_agent(self)
 
-      elif(self.pos != self.sig_pos and self.pos != self.destino):
+      elif(self.pos != self.sig_pos and self.pos != self.destino and self.pos != None and self.sig_pos != None):
         self.model.grid.move_agent(self, self.sig_pos)# mover agente
       
       
@@ -479,10 +480,7 @@ model = Estacionamiento(numero_de_agentes);
 print("numero de cajones comunes: ", cont_car_cajon)
 print('numero de cajones para discapacitados: ', cont_disc_cajon)
 print("numero de cajones para motos", cont_moto_cajon )
-'''
-for i in range(25):
-  model.step()
-'''
+
 while not model.terminar():
   model.step()
 
@@ -497,7 +495,7 @@ axs.set_yticks([])
 patch = plt.imshow(all_grid.iloc[0][0], cmap=plt.cm.binary)
 
 def animate(i):
-    patch.set_data(all_grid.iloc[i][0])
+  patch.set_data(all_grid.iloc[i][0])
     
 anim = animation.FuncAnimation(fig, animate, frames=len(all_grid))
 
