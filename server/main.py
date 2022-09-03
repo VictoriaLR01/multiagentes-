@@ -11,6 +11,8 @@ python -m venv nombreDelEntorno
 nombreDelEntorno\Scripts\activate
 pip install mesa
 pip install pyngrok
+
+http://127.0.0.1:8585
 '''
 
 from Estacionamiento import Estacionamiento
@@ -18,6 +20,8 @@ from Estacionamiento import Estacionamiento
 # creamos el modelo
 numero_de_agentes = 80
 model = Estacionamiento(numero_de_agentes)
+
+    
 
 def features(data, tipo):
     features = []
@@ -37,7 +41,8 @@ def features(data, tipo):
         for elem in data:
             feature = {'vehiculo_id'  : elem['vehiculo_id'],
                    'pos' : elem['posicion'],
-                   'tipo': elem['tipo']    
+                   'tipo': elem['tipo'],
+                   'tiempo' : elem['tiempo']    
             }
             features.append(feature)
             
@@ -54,8 +59,9 @@ class Server(BaseHTTPRequestHandler):
         logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", 
                      str(self.path), str(self.headers))
         self._set_response()
-        model.step()
+        
         data = model.status()
+        
         # obtener los datos del modelo...
         resp = ("{"+"\"admin\":" + features(data["admin"],'admin') + ",\"vehiculos\":" + 
                features(data["vehiculos"],"vehiculos") + 

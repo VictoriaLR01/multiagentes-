@@ -1,7 +1,5 @@
 
 # Librerias
-# %pip install mesa
-# %pip nstall matplotlib
 from mesa import Agent, Model
 
 from mesa.space import MultiGrid
@@ -87,6 +85,9 @@ class Vehiculo(Agent):
     self.tiempo_estacionado = random.randint(100,160) # una vez que se estacione, este es el numero de steps que estara estacionado
     self.destino = None# el cajon que el administrador le asigna
     self.sig_pos = None# la siguiente celda a la que se va a mover cuando se ejecute el advance
+    self.tiempo_en_estacionamiento = 0 # tiempo en el estacionamiento desde que entra hasta que sale 
+    
+    
 
   def step(self):
     '''
@@ -186,8 +187,10 @@ class Vehiculo(Agent):
     
     
 
-  def advance(self):      
+  def advance(self):
+      self.tiempo_en_estacionamiento += 1      
       if(self.pos == (13,9)):
+        print("Tiempo en el estacionamiento (# steps) del vehiculo ",self.unique_id,": ", self.tiempo_en_estacionamiento )
         for v in self.model.vehi:
           if v.unique_id == self.unique_id:
             self.model.vehi.remove(v)
@@ -254,7 +257,7 @@ class Estacionamiento(Model):
     self.grid = MultiGrid(14,12, False)
     self.schedule = SimultaneousActivation(self)
     self.cont_vehiculos = 0 # contador de vehiculos
-    self.spawn = 0 # tiempo en el que va spawneando cada vehiculo 
+    self.spawn = 5 # tiempo en el que va spawneando cada vehiculo 
     self.maxNum_veh = num_agentes_veh
     self.vehi = []
     self.caj = []
@@ -442,7 +445,6 @@ class Estacionamiento(Model):
       
     
     # -----------------------------------------
-    #self.datacollector.collect(self)
     self.schedule.step()
   
   def terminar(self): #funcion que me dice si deberia o no terminar la simulacion
@@ -461,7 +463,7 @@ class Estacionamiento(Model):
     datacaj = []
     dataadmin = []
     for v in self.vehi:
-      datavehi.append({'vehiculo_id': v.unique_id, 'posicion': str(v.pos), 'tipo': v.tipo_vehiculo})
+      datavehi.append({'vehiculo_id': v.unique_id, 'posicion': str(v.pos), 'tipo': v.tipo_vehiculo, 'tiempo' : v.tiempo_en_estacionamiento})
     
     for c in self.caj:
       datacaj.append({'tipo_veh': c.tipo_vehiculo, 'posicion' : str(c.pos), 'estado': c.estado})

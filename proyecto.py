@@ -25,7 +25,7 @@ plt.rcParams["animation.html"] = "jshtml"
 matplotlib.rcParams['animation.embed_limit'] = 2**128
 
 import numpy as np
-import pandas as pd
+
 
 import time
 import datetime
@@ -135,6 +135,7 @@ class Vehiculo(Agent):
     self.tiempo_estacionado = random.randint(100,160) # una vez que se estacione, este es el numero de steps que estara estacionado
     self.destino = None# el cajon que el administrador le asigna
     self.sig_pos = None# la siguiente celda a la que se va a mover cuando se ejecute el advance
+    self.tiempo_en_estacionamiento = 0 # desde que entra hasta que sale
 
   def step(self):
     '''
@@ -234,8 +235,10 @@ class Vehiculo(Agent):
     
     
 
-  def advance(self):      
+  def advance(self):
+      self.tiempo_en_estacionamiento += 1
       if(self.pos == (13,9)):
+        print("Tiempo en el estacionamiento (# steps) del vehiculo ",self.unique_id,": ", self.tiempo_en_estacionamiento )
         # lo sacamos del schedule
         self.model.schedule.remove(self)
         # eliminamos al agente
@@ -243,6 +246,7 @@ class Vehiculo(Agent):
 
       elif(self.pos != self.sig_pos and self.pos != self.destino and self.pos != None and self.sig_pos != None):
         self.model.grid.move_agent(self, self.sig_pos)# mover agente
+        
       
       
 
