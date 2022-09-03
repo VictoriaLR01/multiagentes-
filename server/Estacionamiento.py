@@ -461,19 +461,16 @@ class Estacionamiento(Model):
   def status(self):
     datavehi = []
     datacaj = []
-    dataadmin = []
     for v in self.vehi:
       datavehi.append({'vehiculo_id': v.unique_id, 'posicion': str(v.pos), 'tipo': v.tipo_vehiculo, 'tiempo' : v.tiempo_en_estacionamiento})
     
     for c in self.caj:
       datacaj.append({'tipo_veh': c.tipo_vehiculo, 'posicion' : str(c.pos), 'estado': c.estado})
-
-    #for a in self.admin:
-    dataadmin.append({'cajo_vehi': cont_car_cajon,
-                      'cajo_disc': cont_disc_cajon,
-                      'cajo_moto': cont_moto_cajon})  
     
-    return {"vehiculos":datavehi, "cajones":datacaj, "admin":dataadmin}
+    return {"vehiculos":datavehi, "cajones":datacaj,
+            'cajo_vehi': cont_car_cajon,
+            'cajo_disc': cont_disc_cajon,
+            'cajo_moto': cont_moto_cajon}
 
 
 
