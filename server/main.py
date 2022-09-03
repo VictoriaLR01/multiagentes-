@@ -28,7 +28,8 @@ def features(data, tipo):
     if tipo == 'admin':
         feature = {'cajo_vehi' : data[0]['cajo_vehi'],
                    'cajo_disc' : data[0]['cajo_disc'],
-                   'cajo_moto' : data[0]['cajo_moto']}
+                   'cajo_moto' : data[0]['cajo_moto'],
+                   'terminar' : model.terminar()}
         features.append(feature)
     elif tipo == 'cajones':
         for elem in data:
@@ -59,7 +60,7 @@ class Server(BaseHTTPRequestHandler):
         logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", 
                      str(self.path), str(self.headers))
         self._set_response()
-        
+        model.step()
         data = model.status()
         
         # obtener los datos del modelo...
