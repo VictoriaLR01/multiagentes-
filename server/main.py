@@ -24,7 +24,7 @@ def features(data, tipo):
     if tipo == 'cajones':
         for elem in data:
             feature = {'tipo_veh'  : elem['tipo_veh'],
-                   'estado' : elem['estado'],
+                   'estado' : int(elem['estado']),
                    'pos' : elem['posicion']
             }
             features.append(feature)
@@ -32,7 +32,8 @@ def features(data, tipo):
         for elem in data:
             feature = {'vehiculo_id'  : elem['vehiculo_id'],
                    'pos' : elem['posicion'],
-                   'tipo': elem['tipo']    
+                   'tipo': elem['tipo'],
+                   'tiempo': elem['tiempo']    
             }
             features.append(feature)
             
@@ -55,7 +56,7 @@ class Server(BaseHTTPRequestHandler):
         resp = ("{ \"cajo_vehi\":"+str(data["cajo_vehi"])+
                 ",\"cajo_disc\":"+str(data["cajo_disc"])+
                 ",\"cajo_moto\":"+str(data["cajo_moto"])+
-                ",\"terminar\":"+str(model.terminar())+
+                ",\"terminar\":"+str(int(model.terminar()))+
                 ",\"vehiculos\":" + 
                features(data["vehiculos"],"vehiculos") + 
                ",\"cajones\":"+ features(data['cajones'],"cajones") +"}")

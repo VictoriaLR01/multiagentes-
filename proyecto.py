@@ -55,7 +55,7 @@ def get_grid(model):
             grid[x][y] = 7 # moto negro
           #grid[x][y] = 10
           '''
-          grid[x][y] = 0
+          grid[x][y] = 1
         elif isinstance(obj, Calle):
           grid[x][y] = 3
         else:
@@ -238,7 +238,6 @@ class Vehiculo(Agent):
   def advance(self):
       self.tiempo_en_estacionamiento += 1
       if(self.pos == (13,9)):
-        print("Tiempo en el estacionamiento (# steps) del vehiculo ",self.unique_id,": ", self.tiempo_en_estacionamiento )
         # lo sacamos del schedule
         self.model.schedule.remove(self)
         # eliminamos al agente
