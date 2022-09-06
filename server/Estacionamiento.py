@@ -236,6 +236,7 @@ class Administrador(Agent):
     
     for vecino in vecinos:
       if vecino.pos == self.pos and isinstance(vecino, Vehiculo): 
+        vecino.destino = (13,9)
         for cajon in lista_cajones:
           if not cajon.estado and (cajon.tipo_vehiculo == vecino.tipo_vehiculo):
             cajon.estado = True
@@ -295,9 +296,9 @@ class Estacionamiento(Model):
       else:
         lado_gira = 7
       
-      c = Calle(i,self,lado_gira);
-      self.grid.place_agent(c, (fila, columna));
-      self.schedule.add(c);
+      c = Calle(i,self,lado_gira)
+      self.grid.place_agent(c, (fila, columna))
+      self.schedule.add(c)
 
       columna += 1
       if (columna == 9):
@@ -308,7 +309,7 @@ class Estacionamiento(Model):
             fila+=1
 
 
-    fila = 2;
+    fila = 2
     columnas =1; 
     for i in range (40,84):
 
@@ -354,26 +355,26 @@ class Estacionamiento(Model):
       elif(columnas == 1 and fila == 11):
           lado_gira= 4
      
-      c = Calle(i,self,lado_gira);
+      c = Calle(i,self,lado_gira)
       self.grid.place_agent(c, (fila, columnas))
       self.schedule.add(c)
-      fila+=1;
+      fila+=1
       if(columnas == 1):
           if(fila== 12):
             columnas=2
             fila=2
       
       if (fila == 14):
-          fila = 2;
+          fila = 2
           if(columnas==1):
             
-            columnas=2;
+            columnas=2
           elif(columnas==2):
             
-            columnas=9;
+            columnas=9
           elif(columnas==9):
             
-            columnas=10;
+            columnas=10
 
 
     #------Creacion del admin---------
