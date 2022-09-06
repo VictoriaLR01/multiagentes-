@@ -26,9 +26,6 @@ matplotlib.rcParams['animation.embed_limit'] = 2**128
 
 import numpy as np
 
-
-import time
-import datetime
 import random
 
 def get_grid(model):
@@ -39,27 +36,17 @@ def get_grid(model):
       for obj in cell_content:
         if isinstance(obj, Vehiculo): #
           if obj.tipo_vehiculo == 0:
-            grid[x][y] = 5 # carro gris
+            grid[x][y] = 4 # Carro
           elif obj.tipo_vehiculo == 1:
-            grid[x][y] = 6 # disc gris obs
+            grid[x][y] = 8 # Disc
           else:
-            grid[x][y] = 7 # moto negro
-
+            grid[x][y] = 12 # Moto
         elif isinstance(obj, Cajon):
-          '''
-          if obj.tipo_vehiculo == 0:
-            grid[x][y] = 5 # carro gris
-          elif obj.tipo_vehiculo == 1:
-            grid[x][y] = 6 # disc gris obs
-          else:
-            grid[x][y] = 7 # moto negro
-          #grid[x][y] = 10
-          '''
-          grid[x][y] = 1
+          grid[x][y] = 2
         elif isinstance(obj, Calle):
-          grid[x][y] = 3
+          grid[x][y] = 1
         else:
-          grid[x][y] = 11
+          grid[x][y] = 0
     return grid
 #Variables globales
 '''
@@ -279,6 +266,7 @@ class Administrador(Agent):
     
     for vecino in vecinos:
       if vecino.pos == self.pos and isinstance(vecino, Vehiculo): 
+        vecino.destino = (13,9)
         for cajon in lista_cajones:
           if not cajon.estado and (cajon.tipo_vehiculo == vecino.tipo_vehiculo):
             cajon.estado = True
