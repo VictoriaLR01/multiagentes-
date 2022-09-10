@@ -25,10 +25,7 @@ plt.rcParams["animation.html"] = "jshtml"
 matplotlib.rcParams['animation.embed_limit'] = 2**128
 
 import numpy as np
-import pandas as pd
 
-import time
-import datetime
 import random
 
 def get_grid(model):
@@ -39,27 +36,17 @@ def get_grid(model):
       for obj in cell_content:
         if isinstance(obj, Vehiculo): #
           if obj.tipo_vehiculo == 0:
-            grid[x][y] = 5 # carro gris
+            grid[x][y] = 4 # Carro
           elif obj.tipo_vehiculo == 1:
-            grid[x][y] = 6 # disc gris obs
+            grid[x][y] = 8 # Disc
           else:
-            grid[x][y] = 7 # moto negro
-
+            grid[x][y] = 12 # Moto
         elif isinstance(obj, Cajon):
-          '''
-          if obj.tipo_vehiculo == 0:
-            grid[x][y] = 5 # carro gris
-          elif obj.tipo_vehiculo == 1:
-            grid[x][y] = 6 # disc gris obs
-          else:
-            grid[x][y] = 7 # moto negro
-          #grid[x][y] = 10
-          '''
-          grid[x][y] = 0
+          grid[x][y] = 2
         elif isinstance(obj, Calle):
-          grid[x][y] = 3
+          grid[x][y] = 1
         else:
-          grid[x][y] = 11
+          grid[x][y] = 0
     return grid
 #Variables globales
 '''
@@ -135,6 +122,7 @@ class Vehiculo(Agent):
     self.tiempo_estacionado = random.randint(100,160) # una vez que se estacione, este es el numero de steps que estara estacionado
     self.destino = None# el cajon que el administrador le asigna
     self.sig_pos = None# la siguiente celda a la que se va a mover cuando se ejecute el advance
+    self.tiempo_en_estacionamiento = 0 # desde que entra hasta que sale
 
   def step(self):
     '''
@@ -234,7 +222,8 @@ class Vehiculo(Agent):
     
     
 
-  def advance(self):      
+  def advance(self):
+      self.tiempo_en_estacionamiento += 1
       if(self.pos == (13,9)):
         # lo sacamos del schedule
         self.model.schedule.remove(self)
@@ -243,6 +232,7 @@ class Vehiculo(Agent):
 
       elif(self.pos != self.sig_pos and self.pos != self.destino and self.pos != None and self.sig_pos != None):
         self.model.grid.move_agent(self, self.sig_pos)# mover agente
+        
       
       
 
@@ -276,6 +266,7 @@ class Administrador(Agent):
     
     for vecino in vecinos:
       if vecino.pos == self.pos and isinstance(vecino, Vehiculo): 
+        vecino.destino = (13,9)
         for cajon in lista_cajones:
           if not cajon.estado and (cajon.tipo_vehiculo == vecino.tipo_vehiculo):
             cajon.estado = True

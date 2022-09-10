@@ -21,15 +21,10 @@ model = Estacionamiento(numero_de_agentes)
 
 def features(data, tipo):
     features = []
-    if tipo == 'admin':
-        feature = {'cajo_vehi' : data[0]['cajo_vehi'],
-                   'cajo_disc' : data[0]['cajo_disc'],
-                   'cajo_moto' : data[0]['cajo_moto']}
-        features.append(feature)
-    elif tipo == 'cajones':
+    if tipo == 'cajones':
         for elem in data:
             feature = {'tipo_veh'  : elem['tipo_veh'],
-                   'estado' : elem['estado'],
+                   'estado' : int(elem['estado']),
                    'pos' : elem['posicion']
             }
             features.append(feature)
@@ -37,7 +32,8 @@ def features(data, tipo):
         for elem in data:
             feature = {'vehiculo_id'  : elem['vehiculo_id'],
                    'pos' : elem['posicion'],
-                   'tipo': elem['tipo']    
+                   'tipo': elem['tipo'],
+                   'tiempo': elem['tiempo']    
             }
             features.append(feature)
             
@@ -57,7 +53,11 @@ class Server(BaseHTTPRequestHandler):
         model.step()
         data = model.status()
         # obtener los datos del modelo...
-        resp = ("{"+"\"admin\":" + features(data["admin"],'admin') + ",\"vehiculos\":" + 
+        resp = ("{ \"cajo_vehi\":"+str(data["cajo_vehi"])+
+                ",\"cajo_disc\":"+str(data["cajo_disc"])+
+                ",\"cajo_moto\":"+str(data["cajo_moto"])+
+                ",\"terminar\":"+str(int(model.terminar()))+
+                ",\"vehiculos\":" + 
                features(data["vehiculos"],"vehiculos") + 
                ",\"cajones\":"+ features(data['cajones'],"cajones") +"}")
         

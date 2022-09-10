@@ -1,17 +1,12 @@
 
 # Librerias
-# %pip install mesa
-# %pip nstall matplotlib
 from mesa import Agent, Model
 
 from mesa.space import MultiGrid
 
 from mesa.time import SimultaneousActivation
 
-from mesa.datacollection import DataCollector
-
 import random
-
 
 #Variables globales
 '''
@@ -87,6 +82,9 @@ class Vehiculo(Agent):
     self.tiempo_estacionado = random.randint(100,160) # una vez que se estacione, este es el numero de steps que estara estacionado
     self.destino = None# el cajon que el administrador le asigna
     self.sig_pos = None# la siguiente celda a la que se va a mover cuando se ejecute el advance
+    self.tiempo_en_estacionamiento = 0 # tiempo en el estacionamiento desde que entra hasta que sale 
+    
+    
 
   def step(self):
     '''
@@ -186,8 +184,10 @@ class Vehiculo(Agent):
     
     
 
-  def advance(self):      
+  def advance(self):
+      self.tiempo_en_estacionamiento += 1      
       if(self.pos == (13,9)):
+        print("Tiempo en el estacionamiento (# steps) del vehiculo ",self.unique_id,": ", self.tiempo_en_estacionamiento )
         for v in self.model.vehi:
           if v.unique_id == self.unique_id:
             self.model.vehi.remove(v)
@@ -233,6 +233,7 @@ class Administrador(Agent):
     
     for vecino in vecinos:
       if vecino.pos == self.pos and isinstance(vecino, Vehiculo): 
+        vecino.destino = (13,9)
         for cajon in lista_cajones:
           if not cajon.estado and (cajon.tipo_vehiculo == vecino.tipo_vehiculo):
             cajon.estado = True
@@ -254,7 +255,7 @@ class Estacionamiento(Model):
     self.grid = MultiGrid(14,12, False)
     self.schedule = SimultaneousActivation(self)
     self.cont_vehiculos = 0 # contador de vehiculos
-    self.spawn = 0 # tiempo en el que va spawneando cada vehiculo 
+    self.spawn = 5 # tiempo en el que va spawneando cada vehiculo 
     self.maxNum_veh = num_agentes_veh
     self.vehi = []
     self.caj = []
@@ -292,9 +293,9 @@ class Estacionamiento(Model):
       else:
         lado_gira = 7
       
-      c = Calle(i,self,lado_gira);
-      self.grid.place_agent(c, (fila, columna));
-      self.schedule.add(c);
+      c = Calle(i,self,lado_gira)
+      self.grid.place_agent(c, (fila, columna))
+      self.schedule.add(c)
 
       columna += 1
       if (columna == 9):
@@ -305,7 +306,7 @@ class Estacionamiento(Model):
             fila+=1
 
 
-    fila = 2;
+    fila = 2
     columnas =1; 
     for i in range (40,84):
 
@@ -351,26 +352,26 @@ class Estacionamiento(Model):
       elif(columnas == 1 and fila == 11):
           lado_gira= 4
      
-      c = Calle(i,self,lado_gira);
+      c = Calle(i,self,lado_gira)
       self.grid.place_agent(c, (fila, columnas))
       self.schedule.add(c)
-      fila+=1;
+      fila+=1
       if(columnas == 1):
           if(fila== 12):
             columnas=2
             fila=2
       
       if (fila == 14):
-          fila = 2;
+          fila = 2
           if(columnas==1):
             
-            columnas=2;
+            columnas=2
           elif(columnas==2):
             
-            columnas=9;
+            columnas=9
           elif(columnas==9):
             
-            columnas=10;
+            columnas=10
 
 
     #------Creacion del admin---------
@@ -442,7 +443,6 @@ class Estacionamiento(Model):
       
     
     # -----------------------------------------
-    #self.datacollector.collect(self)
     self.schedule.step()
   
   def terminar(self): #funcion que me dice si deberia o no terminar la simulacion
@@ -459,19 +459,13 @@ class Estacionamiento(Model):
   def status(self):
     datavehi = []
     datacaj = []
-    dataadmin = []
     for v in self.vehi:
-      datavehi.append({'vehiculo_id': v.unique_id, 'posicion': str(v.pos), 'tipo': v.tipo_vehiculo})
+      datavehi.append({'vehiculo_id': v.unique_id, 'posicion': str(v.pos), 'tipo': v.tipo_vehiculo, 'tiempo' : v.tiempo_en_estacionamiento})
     
     for c in self.caj:
       datacaj.append({'tipo_veh': c.tipo_vehiculo, 'posicion' : str(c.pos), 'estado': c.estado})
-
-    #for a in self.admin:
-    dataadmin.append({'cajo_vehi': cont_car_cajon,
-                      'cajo_disc': cont_disc_cajon,
-                      'cajo_moto': cont_moto_cajon})  
     
-    return {"vehiculos":datavehi, "cajones":datacaj, "admin":dataadmin}
-
-
-
+    return {"vehiculos":datavehi, "cajones":datacaj,
+            'cajo_vehi': cont_car_cajon,
+            'cajo_disc': cont_disc_cajon,
+            'cajo_moto': cont_moto_cajon}
