@@ -6,10 +6,7 @@ from mesa.space import MultiGrid
 
 from mesa.time import SimultaneousActivation
 
-from mesa.datacollection import DataCollector
-
 import random
-
 
 #Variables globales
 '''
@@ -472,6 +469,3 @@ class Estacionamiento(Model):
             'cajo_vehi': cont_car_cajon,
             'cajo_disc': cont_disc_cajon,
             'cajo_moto': cont_moto_cajon}
-
-
-
